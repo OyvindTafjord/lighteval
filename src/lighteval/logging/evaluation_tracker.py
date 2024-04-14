@@ -135,6 +135,7 @@ class EvaluationTracker:
         output_dir_details_sub_folder.mkdir(parents=True, exist_ok=True)
 
         output_results_file = output_dir_results / f"results_{date_id}.json"
+        metrics_file = Path(output_dir) / "metrics.json"
         output_results_in_details_file = output_dir_details / f"results_{date_id}.json"
 
         hlog(f"Saving results to {output_results_file} and {output_results_in_details_file}")
@@ -156,6 +157,9 @@ class EvaluationTracker:
         dumped = json.dumps(to_dump, cls=EnhancedJSONEncoder, indent=2)
 
         with open(output_results_file, "w") as f:
+            f.write(dumped)
+
+        with open(metrics_file, "w") as f:
             f.write(dumped)
 
         with open(output_results_in_details_file, "w") as f:
