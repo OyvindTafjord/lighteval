@@ -794,6 +794,29 @@ def hellaswag_helm(line, task_name: str = None):
     )
 
 
+def hellaswag_mc(line, task_name: str = None):
+    def preprocess(text):
+        """Comes from AiHarness"""
+        # text = text.strip()
+        # NOTE: Brackets are artifacts of the WikiHow dataset portion of HellaSwag.
+        text = text.replace(" [title]", ". ")
+        text = re.sub("\\[.*?\\]", "", text)
+        text = text.replace("  ", " ")
+        return text
+
+    query = f"Choose the best continuation: {line['activity_label']}: {line['ctx_a']} {line['ctx_b'].capitalize()}\n"
+    query += "".join([f"{key}. {choice}\n" for key, choice in zip(LETTER_INDICES, line["endings"])])
+    query += "Answer:"
+    query = preprocess(query)
+
+    return Doc(
+        task_name=task_name,
+        query=query,
+        choices=[" " + i for i in LETTER_INDICES[: len(line["endings"])]],
+        gold_index=int(line["label"]) if line["label"] != "" else -1,  # -1 for test
+    )
+
+
 def humaneval(line, task_name: str = None):
     # "test_cases": line["test"]
     return Doc(
